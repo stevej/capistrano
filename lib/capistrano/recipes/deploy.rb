@@ -179,9 +179,6 @@ namespace :deploy do
     dirs = [deploy_to, releases_path, shared_path]
     dirs += shared_children.map { |d| File.join(shared_path, d) }
     run "#{try_sudo} mkdir -p #{dirs.join(' ')} && #{try_sudo} chmod g+w #{dirs.join(' ')}"
-    unless user.nil?
-      run "#{try_sudo} chown -R #{user}:#{user} #{dirs.join(' ')}"
-    end
   end
 
   desc <<-DESC
