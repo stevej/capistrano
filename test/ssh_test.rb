@@ -58,6 +58,22 @@ class SSHTest < Test::Unit::TestCase
     assert_equal success, Capistrano::SSH.connect(server)
   end
 
+  def test_connect_with_nonexistant_server_with_port_should_raise
+    server = server("localhost:1235")
+    Net::SSH.expects(:start).with(server.host, "default-user", @options.merge(:port => 1235)).raises(Errno::ECONNREFUSED)
+    assert_raises(Errno::ECONNREFUSED) do
+      Capistrano::SSH.connect(server)
+    end
+  end
+
+  def test_connect_with_quoted_server_should_raise
+    server = server('"localhost"')
+    Net::SSH.expects(:start).with(server.host, "default-user", @options).raises(Errno::ECONNREFUSED)
+    assert_raises(Errno::ECONNREFUSED) do
+      Capistrano::SSH.connect(server)
+    end
+  end
+
   def test_connect_with_server_with_user_and_port_should_pass_user_and_port_to_net_ssh
     server = server("jamis@capistrano:1235")
     Net::SSH.expects(:start).with(server.host, "jamis", @options.merge(:port => 1235)).returns(success = Object.new)
